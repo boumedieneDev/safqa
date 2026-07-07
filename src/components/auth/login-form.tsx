@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Lock, Mail } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -15,7 +14,6 @@ import { createClient } from "@/lib/supabase/client";
 type LoginValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const router = useRouter();
   const [authError, setAuthError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
@@ -34,11 +32,20 @@ export function LoginForm() {
     setAuthError(null);
     setIsSubmitting(true);
 
-    const supabase = createClient();
+    let supabase: ReturnType<typeof createClient>;
+
+    try {
+      supabase = createClient();
+    } catch {
+      setAuthError("إعدادات Supabase غير مكتملة في بيئة النشر. تحقق من متغيرات Netlify ثم أعد النشر.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword(values);
 
     if (error || !data.user) {
-      setAuthError("تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور.");
+      setAuthError(getAuthErrorMessage(error?.message));
       setIsSubmitting(false);
       return;
     }
@@ -53,13 +60,12 @@ export function LoginForm() {
 
     if (profileError || assignmentIssue) {
       await supabase.auth.signOut();
-      setAuthError(getLoginErrorMessage(assignmentIssue));
+      setAuthError(getLoginErrorMessage(assignmentIssue, profileError?.message));
       setIsSubmitting(false);
       return;
     }
 
-    router.refresh();
-    router.push(getHomePathForProfile(profile));
+    window.location.assign(getHomePathForProfile(profile));
   }
 
   return (
@@ -90,7 +96,27 @@ export function LoginForm() {
   );
 }
 
-function getLoginErrorMessage(issue: string | null) {
+function getAuthErrorMessage(message?: string) {
+  if (!message) {
+    return "تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور.";
+  }
+
+  if (message.toLowerCase().includes("invalid login credentials")) {
+    return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+  }
+
+  if (message.toLowerCase().includes("email not confirmed")) {
+    return "البريد الإلكتروني غير مؤكد في Supabase.";
+  }
+
+  if (message.toLowerCase().includes("invalid api key")) {
+    return "مفتاح Supabase في Netlify غير صحيح. تحقق من NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.";
+  }
+
+  return `تعذر تسجيل الدخول: ${message}`;
+}
+
+function getLoginErrorMessage(issue: string | null, profileError?: string) {
   if (issue === "inactive_profile") {
     return "هذا الحساب غير مفعّل حالياً. يرجى التواصل مع مدير الجهة.";
   }
@@ -101,6 +127,10 @@ function getLoginErrorMessage(issue: string | null) {
 
   if (issue && issue !== "missing_profile") {
     return "الحساب موجود، لكن ربطه بالجهة أو المتعامل غير مكتمل.";
+  }
+
+  if (profileError) {
+    return `تم تسجيل الدخول، لكن تعذر قراءة ملف الحساب داخل profiles: ${profileError}`;
   }
 
   return "تم العثور على حساب Auth، لكن لم يتم ربطه بملف profile داخل المنصة.";
