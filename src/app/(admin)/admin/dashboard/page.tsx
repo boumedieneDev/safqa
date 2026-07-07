@@ -2,6 +2,9 @@ import { AdminDashboardOverview, type AdminDashboardCounts } from "@/components/
 import { PageHeader } from "@/components/layout/page-header";
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
   const [requests, pendingRequests, invitations, organizations, operators] = await Promise.all([

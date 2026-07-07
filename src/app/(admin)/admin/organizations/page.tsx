@@ -2,6 +2,9 @@ import { AdminEntityDirectory, type AdminOrganizationRow } from "@/components/ad
 import { PageHeader } from "@/components/layout/page-header";
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminOrganizationsPage() {
   const supabase = await createClient();
   const { data, error } = await supabase

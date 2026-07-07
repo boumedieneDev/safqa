@@ -1,6 +1,9 @@
 import { InviteAcceptanceForm, type InvitationDetails } from "@/components/registration/invite-acceptance-form";
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface InviteRegistrationPageProps {
   searchParams: Promise<{
     token?: string;

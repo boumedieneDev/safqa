@@ -7,6 +7,9 @@ import { PageHeader } from "@/components/layout/page-header";
 import { createClient } from "@/lib/supabase/server";
 import type { UserRole } from "@/types/domain";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function InstitutionUsersPage() {
   const supabase = await createClient();
   const {
