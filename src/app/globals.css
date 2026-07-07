@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-arabic: "Cairo Variable";
+  --background: 210 33% 98%;
+  --foreground: 215 33% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 33% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 33% 12%;
+  --primary: 213 88% 20%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 181 78% 40%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 210 18% 92%;
+  --muted-foreground: 215 14% 44%;
+  --accent: 186 56% 92%;
+  --accent-foreground: 186 72% 23%;
+  --destructive: 0 72% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 18% 86%;
+  --input: 214 18% 86%;
+  --ring: 210 76% 34%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl;
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(180deg, rgba(231, 241, 249, 0.74), rgba(248, 250, 252, 0.95) 36%),
+    hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-arabic), Arial, sans-serif;
+  font-feature-settings: "kern";
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(15, 118, 110, 0.18);
+}
